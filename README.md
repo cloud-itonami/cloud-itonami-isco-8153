@@ -2,6 +2,26 @@
 
 Open Occupation Blueprint for **ISCO-08 8153**: Sewing Machine Operators.
 
+**Maturity: `:implemented`** — SewingAdvisor ⊣ SewingOperationsGovernor
+as a langgraph StateGraph (`intake → advise → govern → decide →
+commit/hold`, human-approval interrupt), modeled on
+cloud-itonami-isco-4311's bookkeeping actor. 14 tests / 30 assertions
+green. The governor never dispatches hardware — it only gates what
+the material-handling robot below may execute.
+
+The sew-run HARD invariants — a spec band and arithmetic, not operator
+feel:
+
+1. **Stitch-density band** — the measured stitch density must fall
+   inside the registered [min, max] band.
+2. **Seam-deviation ceiling** — the measured seam deviation must not
+   exceed the registered ceiling.
+
+`:approve-needle-mechanism-operation` and
+`:clear-quality-inspection-failure` **always** escalate to human
+sign-off regardless of confidence, per this repo's Trust Controls
+(business-model.md).
+
 This repository designs a forkable OSS business for an independent sewing machine operator: a material-handling robot performs fabric feeding and cut-piece sorting under a governor-gated actor, so the operator keeps their own production and quality records instead of renting a closed garment-production SaaS.
 
 ## Robotics premise
