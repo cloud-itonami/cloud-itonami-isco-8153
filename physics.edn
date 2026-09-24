@@ -1,0 +1,33 @@
+;; What this vertical's robot physically does, declared for
+;; kotoba.robotics.process (kotoba-lang/robotics). `kbb -M:physics` runs it.
+;;
+;; README "Robotics premise": a material-handling robot performs fabric
+;; feeding and cut-piece sorting near sewing equipment; operating near the
+;; needle mechanism needs human sign-off. Its physical work is moving cut
+;; pieces: sorting a bundle of cut pieces from the cutting table into a line
+;; bin, and carrying bundle carts from the cutting room to the sewing line.
+;;
+;; Every number without a cited source is marked `estimate` in its :basis.
+;; Replacing an estimate with a sourced value is this bot's growth work.
+{:physics/schema "itonami.physical-ai.spec.v1"
+ :repo "cloud-itonami/cloud-itonami-isco-8153"
+ :cases
+ [{:id :cut-bundle-to-bin
+   :kind :manipulator
+   :procedure "small arm lifts a bundle of cut pieces from the cutting table into a raised sewing-line bin"
+   :params {:l1-m 0.30 :l2-m 0.25 :m1-kg 2.0 :m2-kg 1.2
+            :from [0.35 0.05] :to [0.10 0.40] :duration-s 1.2 :steps 400}
+   :sweep {:param :payload-kg :values [0.2 0.5 1.0 1.5 2.0]}
+   :quantity :peak-tau1-nm
+   :limit {:max 15.0 :basis "estimate: continuous shoulder torque of a small (~3 kg payload class) table-top collaborative arm"}
+   :boundary {:lo 0.05 :hi 10.0}}
+  {:id :bundle-cart-to-line
+   :kind :transport
+   :procedure "AMR carries a cart of cut-piece bundles from the cutting room to a sewing workstation"
+   :params {:mass-kg 40.0 :payload-kg 30.0 :v-max-mps 0.8 :a-max-mps2 0.5
+            :brake-decel-mps2 0.8 :drive-force-n 120.0 :crr 0.02
+            :cog-height-m 0.50 :support-half-length-m 0.25 :max-time-s 1200.0}
+   :sweep {:param :distance-m :values [10.0 20.0 40.0 60.0 80.0]}
+   :quantity :cycle-time-s
+   :limit {:max 60.0 :basis "estimate: the next bundle must arrive before an operator finishes the current bundle (~1 min of sewing at a progressive-bundle station)"}
+   :boundary {:lo 1.0 :hi 200.0}}]}
